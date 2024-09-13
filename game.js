@@ -325,8 +325,15 @@ function showGameOverScreen() {
   const finalTime = `${minutes}:${seconds}`;
 
   // Display the final message
-  const finalMessage = document.getElementById('finalMessage');
-  finalMessage.textContent = `${playerName}, you procrastinated for ${finalTime} with ${score} modules! KraftPowercon. We won't let you bore down.`;
+const finalMessage = document.getElementById('finalMessage');
+finalMessage.textContent = `${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!`;
+
+// Create a new paragraph for the additional sentence
+const newSentence = document.createElement('p');
+newSentence.textContent = 'KraftPowercon. We won't let you down!';
+
+// Append the new paragraph after the final message
+finalMessage.parentNode.insertBefore(newSentence, finalMessage.nextSibling);
 
   // Update high score table
   updateHighScores(playerName, finalTime);
