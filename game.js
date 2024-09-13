@@ -71,7 +71,7 @@ let currentState = GAME_STATE.START;
 
 // Scoring variables
 let score = 0;
-const lineClearPoints = [0, 100, 300, 500, 800];
+const lineClearPoints = [0, 10, 20, 30, 40];
 
 // Timer variables
 let startTime = null;
