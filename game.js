@@ -328,7 +328,7 @@ function showGameOverScreen() {
   const finalMessage = document.getElementById('finalMessage');
   finalMessage.innerHTML = `
     <p>${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!</p>
-    <p>You are a true procrastination master!</p>
+    <p>KraftPowercon. We won't let you bore down!</p>
   `;
 
   // Update high score table
