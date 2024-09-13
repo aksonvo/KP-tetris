@@ -326,7 +326,7 @@ function showGameOverScreen() {
 
   // Display the final message
   const finalMessage = document.getElementById('finalMessage');
-  finalMessage.textContent = `${playerName}, you survived for ${finalTime} with a score of ${score}!`;
+  finalMessage.textContent = `${playerName}, you procrastinated for ${finalTime} with ${score} modules! KraftPowercon. We won't let you bore down.`;
 
   // Update high score table
   updateHighScores(playerName, finalTime);
