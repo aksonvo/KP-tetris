@@ -71,7 +71,7 @@ let currentState = GAME_STATE.START;
 
 // Scoring variables
 let score = 0;
-const lineClearPoints = [0, 10, 30, 50, 80];
+const lineClearPoints = [0, 100, 300, 500, 800];
 
 // Timer variables
 let startTime = null;
@@ -324,26 +324,16 @@ function showGameOverScreen() {
   const seconds = String(totalSeconds % 60).padStart(2, '0');
   const finalTime = `${minutes}:${seconds}`;
 
-  function showGameOverScreen() {
-    document.getElementById('gameCanvas').style.display = 'none';
-    document.getElementById('gameHeader').style.display = 'none';
-    document.getElementById('gameOverScreen').style.display = 'flex';
-  
-    // Format the elapsed time
-    const totalSeconds = Math.floor(elapsedTime / 1000);
-    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-    const seconds = String(totalSeconds % 60).padStart(2, '0');
-    const finalTime = `${minutes}:${seconds}`;
-  
-    // Display the final message
-    const finalMessage = document.getElementById('finalMessage');
-    finalMessage.innerHTML = `
-      <p>${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!</p>
-      <p>KraftPowercon. We won't let you bore down!</p>`;
-  
-    // Update high score table
-    updateHighScores(playerName, finalTime);
-  }
+  // Display the final message
+  const finalMessage = document.getElementById('finalMessage');
+  finalMessage.innerHTML = `
+    <p>${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!</p>
+    <p>You are a true procrastination master!</p>
+  `;
+
+  // Update high score table
+  updateHighScores(playerName, finalTime);
+}
 
 function restartGame() {
   // Reset game variables
@@ -441,4 +431,4 @@ function update(time = 0) {
 
 // Initialize the game (do not start yet)
 document.getElementById('gameHeader').style.display = 'none';
-drawBoard();}
+drawBoard();

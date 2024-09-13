@@ -42,14 +42,14 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 300px; /* Match canvas width */
-  margin: 14px auto 0 auto;
+  margin: 20px auto 0 auto;
   padding: 0 10px;
   box-sizing: border-box;
 }
 
 #scoreContainer,
 #timeContainer {
-  font-size: 14px;
+  font-size: 24px;
 }
 
 #gameCanvas {
