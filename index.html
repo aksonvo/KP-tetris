@@ -6,20 +6,22 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h1>Kraft Tetris</h1>
+    <p>Enter Your Name:</p>
+    <input type="text" id="playerName" placeholder="Your Name" maxlength="10">
+    <p>Press Spacebar to Start</p>
+  </div>
+
   <!-- Game Header -->
-  <div id="gameHeader">
+  <div id="gameHeader" style="display: none;">
     <div id="scoreContainer">
       Score: <span id="score">0</span>
     </div>
     <div id="timeContainer">
-      Time procrastinated: <span id="time">00:00</span>
+      Time: <span id="time">00:00</span>
     </div>
-  </div>
-
-  <!-- Start Screen -->
-  <div id="startScreen">
-    <h1>Kraft Tetris</h1>
-    <p>Press Spacebar to Start</p>
   </div>
 
   <!-- Game Canvas -->
@@ -29,6 +31,30 @@
   <div id="pauseScreen" style="display: none;">
     <h2>Paused</h2>
     <p>Press Spacebar to Resume</p>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameOverScreen" style="display: none;">
+    <h2>Game Over</h2>
+    <p id="finalMessage"></p>
+    <p>Press Enter to Restart</p>
+  </div>
+
+  <!-- High Score Table -->
+  <div id="highScoreTable" style="display: none;">
+    <h3>High Scores</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody id="highScoresBody">
+        <!-- High scores will be dynamically inserted here -->
+      </tbody>
+    </table>
   </div>
 
   <script src="game.js"></script>

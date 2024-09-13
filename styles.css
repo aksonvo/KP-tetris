@@ -5,23 +5,9 @@ body {
   font-family: Arial, sans-serif;
 }
 
-#gameHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 300px; /* Match canvas width */
-  margin: 20px auto 0 auto;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-
-#scoreContainer,
-#timeContainer {
-  font-size: 14px;
-}
-
 #startScreen,
-#pauseScreen {
+#pauseScreen,
+#gameOverScreen {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -31,13 +17,38 @@ body {
 }
 
 #startScreen h1,
-#pauseScreen h2 {
+#pauseScreen h2,
+#gameOverScreen h2 {
   font-size: 48px;
   margin-bottom: 20px;
 }
 
 #startScreen p,
-#pauseScreen p {
+#pauseScreen p,
+#gameOverScreen p {
+  font-size: 24px;
+}
+
+#startScreen input[type="text"] {
+  font-size: 24px;
+  padding: 10px;
+  margin: 10px 0;
+  width: 200px;
+  text-align: center;
+}
+
+#gameHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 300px; /* Match canvas width */
+  margin: 14px auto 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+#scoreContainer,
+#timeContainer {
   font-size: 24px;
 }
 
@@ -46,4 +57,33 @@ body {
   display: block;
   margin: 20px auto;
   /* Center the canvas */
+}
+
+#highScoreTable {
+  text-align: center;
+  margin: 20px auto;
+}
+
+#highScoreTable h3 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+#highScoreTable table {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+#highScoreTable th,
+#highScoreTable td {
+  border: 1px solid #fff;
+  padding: 8px 12px;
+}
+
+#highScoreTable th {
+  font-size: 20px;
+}
+
+#highScoreTable td {
+  font-size: 18px;
 }

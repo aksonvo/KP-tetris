@@ -79,6 +79,11 @@ let elapsedTime = 0;
 let timerInterval = null;
 
 let currentPiece = null;
+let lastTime = 0;
+let dropCounter = 0;
+let dropInterval = 1000;
+
+let playerName = '';
 
 // Function to create a new piece
 function newPiece() {
@@ -156,8 +161,7 @@ function moveDown() {
             // Game over
             currentState = GAME_STATE.OVER;
             clearInterval(timerInterval); // Stop the timer
-            alert('Game Over');
-            document.location.reload();
+            showGameOverScreen();
             return;
           }
           board[currentPiece.y + row][currentPiece.x + col] = currentPiece.image;
@@ -261,34 +265,22 @@ document.addEventListener('keydown', (e) => {
       // Resume the game
       resumeGame();
     }
+  } else if (currentState === GAME_STATE.OVER) {
+    if (e.code === 'Enter') {
+      // Restart the game
+      restartGame();
+    }
   }
 });
 
-// Game loop
-let dropCounter = 0;
-let dropInterval = 1000;
-let lastTime = 0;
-
-function update(time = 0) {
-  if (currentState !== GAME_STATE.PLAYING) {
-    return; // Exit the game loop if not playing
-  }
-
-  const deltaTime = time - lastTime;
-  lastTime = time;
-  dropCounter += deltaTime;
-  if (dropCounter > dropInterval) {
-    moveDown();
-    dropCounter = 0;
-  }
-  drawBoard();
-  drawPiece();
-  requestAnimationFrame(update);
-}
-
 function startGame() {
+  const playerNameInput = document.getElementById('playerName');
+  playerName = playerNameInput.value.trim() || 'Player'; // Default to 'Player' if name is empty
+
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameCanvas').style.display = 'block';
+  document.getElementById('gameHeader').style.display = 'flex';
+
   currentState = GAME_STATE.PLAYING;
   score = 0;
   updateScoreDisplay();
@@ -321,5 +313,119 @@ function resumeGame() {
   update();
 }
 
+function showGameOverScreen() {
+  document.getElementById('gameCanvas').style.display = 'none';
+  document.getElementById('gameHeader').style.display = 'none';
+  document.getElementById('gameOverScreen').style.display = 'flex';
+
+  // Format the elapsed time
+  const totalSeconds = Math.floor(elapsedTime / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  const finalTime = `${minutes}:${seconds}`;
+
+  // Display the final message
+  const finalMessage = document.getElementById('finalMessage');
+  finalMessage.textContent = `${playerName}, you survived for ${finalTime} with a score of ${score}!`;
+
+  // Update high score table
+  updateHighScores(playerName, finalTime);
+}
+
+function restartGame() {
+  // Reset game variables
+  board = [];
+  for (let row = 0; row < rows; row++) {
+    board[row] = [];
+    for (let col = 0; col < cols; col++) {
+      board[row][col] = 0;
+    }
+  }
+
+  currentState = GAME_STATE.START;
+  elapsedTime = 0;
+  score = 0;
+
+  // Hide game over and high score screens, show start screen
+  document.getElementById('gameOverScreen').style.display = 'none';
+  document.getElementById('highScoreTable').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'flex';
+}
+
+function updateTimeDisplay() {
+  const totalSeconds = Math.floor(elapsedTime / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  document.getElementById('time').textContent = `${minutes}:${seconds}`;
+}
+
+function updateHighScores(name, time) {
+  // Retrieve high scores from localStorage
+  let highScores = JSON.parse(localStorage.getItem('tetrisHighScores')) || [];
+
+  // Convert time to seconds for sorting
+  const [minutes, seconds] = time.split(':').map(Number);
+  const totalSeconds = minutes * 60 + seconds;
+
+  // Add new score
+  highScores.push({ name, time, totalSeconds });
+
+  // Sort high scores by totalSeconds in descending order (longer times first)
+  highScores.sort((a, b) => b.totalSeconds - a.totalSeconds);
+
+  // Keep only top 5 scores
+  highScores = highScores.slice(0, 5);
+
+  // Save back to localStorage
+  localStorage.setItem('tetrisHighScores', JSON.stringify(highScores));
+
+  // Display high scores
+  displayHighScores(highScores);
+}
+
+function displayHighScores(highScores) {
+  const highScoresBody = document.getElementById('highScoresBody');
+  highScoresBody.innerHTML = ''; // Clear existing rows
+
+  highScores.forEach((entry, index) => {
+    const row = document.createElement('tr');
+    const rankCell = document.createElement('td');
+    const nameCell = document.createElement('td');
+    const timeCell = document.createElement('td');
+
+    rankCell.textContent = index + 1;
+    nameCell.textContent = entry.name;
+    timeCell.textContent = entry.time;
+
+    row.appendChild(rankCell);
+    row.appendChild(nameCell);
+    row.appendChild(timeCell);
+
+    highScoresBody.appendChild(row);
+  });
+
+  // Show the high score table
+  document.getElementById('highScoreTable').style.display = 'block';
+}
+
+// Game loop
+function update(time = 0) {
+  if (currentState !== GAME_STATE.PLAYING) {
+    return; // Exit the game loop if not playing
+  }
+
+  const deltaTime = time - lastTime;
+  lastTime = time;
+  dropCounter += deltaTime;
+  if (dropCounter > dropInterval) {
+    moveDown();
+    dropCounter = 0;
+  }
+  drawBoard();
+  drawPiece();
+  requestAnimationFrame(update);
+}
+
 // Initialize the game (do not start yet)
+document.getElementById('gameHeader').style.display = 'none';
 drawBoard();
