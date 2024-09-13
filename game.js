@@ -441,4 +441,4 @@ function update(time = 0) {
 
 // Initialize the game (do not start yet)
 document.getElementById('gameHeader').style.display = 'none';
-drawBoard();
+drawBoard();}
