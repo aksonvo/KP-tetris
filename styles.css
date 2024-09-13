@@ -1,13 +1,38 @@
 body {
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #000;
-    height: 100vh;
-  }
-  
-  #gameCanvas {
-    background-color: #00447C;
-    display: block;
-  }
+  margin: 0;
+  background-color: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+#startScreen,
+#pauseScreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+#startScreen h1,
+#pauseScreen h2 {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+#startScreen p,
+#pauseScreen p {
+  font-size: 24px;
+}
+
+#gameCanvas {
+  background-color: #00447C;
+  display: block;
+  margin: auto;
+  /* Center the canvas */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

@@ -6,29 +6,31 @@ const grid = 30;
 const rows = 20;
 const cols = 10;
 
-// Load product images
+// Load the pixel image once
+const pixelImage = new Image();
+pixelImage.src = 'images/pixel.png';
+
+// Assign the same image to all tetrominoes
 const images = {
-  I: 'images/I.png',
-  J: 'images/J.png',
-  L: 'images/L.png',
-  O: 'images/O.png',
-  S: 'images/S.png',
-  T: 'images/T.png',
-  Z: 'images/Z.png',
+  I: pixelImage,
+  J: pixelImage,
+  L: pixelImage,
+  O: pixelImage,
+  S: pixelImage,
+  T: pixelImage,
+  Z: pixelImage,
 };
 
 // Tetromino shapes
 const tetrominoes = {
   I: [[1, 1, 1, 1]],
   J: [
-    [0, 1],
-    [0, 1],
-    [1, 1],
+    [1, 0, 0],
+    [1, 1, 1],
   ],
   L: [
-    [1, 0],
-    [1, 0],
-    [1, 1],
+    [0, 0, 1],
+    [1, 1, 1],
   ],
   O: [
     [1, 1],
@@ -39,8 +41,8 @@ const tetrominoes = {
     [1, 1, 0],
   ],
   T: [
-    [1, 1, 1],
     [0, 1, 0],
+    [1, 1, 1],
   ],
   Z: [
     [1, 1, 0],
@@ -57,6 +59,16 @@ for (let row = 0; row < rows; row++) {
   }
 }
 
+// Game States
+const GAME_STATE = {
+  START: 'start',
+  PLAYING: 'playing',
+  PAUSED: 'paused',
+  OVER: 'over',
+};
+
+let currentState = GAME_STATE.START;
+
 // Current piece
 let currentPiece = null;
 
@@ -67,21 +79,19 @@ function newPiece() {
   const shape = tetrominoes[random];
   currentPiece = {
     x: Math.floor(cols / 2) - Math.ceil(shape[0].length / 2),
-    y: 0,
+    y: -1, // Start above the board
     shape: shape,
-    image: new Image(),
+    image: images[random], // Use the preloaded pixel image
   };
-  currentPiece.image.src = images[random];
 }
 
 // Function to draw the board
 function drawBoard() {
+  context.clearRect(0, 0, canvas.width, canvas.height);
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       if (board[row][col]) {
         context.drawImage(board[row][col], col * grid, row * grid, grid, grid);
-      } else {
-        context.clearRect(col * grid, row * grid, grid, grid);
       }
     }
   }
@@ -136,12 +146,12 @@ function moveDown() {
         if (currentPiece.shape[row][col]) {
           if (currentPiece.y + row < 0) {
             // Game over
+            currentState = GAME_STATE.OVER;
             alert('Game Over');
             document.location.reload();
             return;
           }
-          board[currentPiece.y + row][currentPiece.x + col] =
-            currentPiece.image;
+          board[currentPiece.y + row][currentPiece.x + col] = currentPiece.image;
         }
       }
     }
@@ -166,6 +176,9 @@ function clearLines() {
           board[y][col] = board[y - 1][col];
         }
       }
+      for (let col = 0; col < cols; col++) {
+        board[0][col] = 0;
+      }
       row++;
     }
   }
@@ -174,37 +187,51 @@ function clearLines() {
 // Rotate the piece
 function rotatePiece() {
   const shape = currentPiece.shape;
-  const N = shape.length;
-  let newShape = [];
-  for (let row = 0; row < N; row++) {
-    newShape[row] = [];
-    for (let col = 0; col < N; col++) {
-      newShape[row][col] = shape[N - col - 1][row];
-    }
-  }
-  if (!collision(currentPiece.x, currentPiece.y, newShape)) {
-    currentPiece.shape = newShape;
+  // Transpose the shape
+  const transposedShape = shape[0].map((_, colIndex) =>
+    shape.map(row => row[colIndex])
+  );
+  // Reverse each row to get the rotated shape
+  const rotatedShape = transposedShape.map(row => row.reverse());
+
+  if (!collision(currentPiece.x, currentPiece.y, rotatedShape)) {
+    currentPiece.shape = rotatedShape;
   }
 }
 
 // Key controls
 document.addEventListener('keydown', (e) => {
-  if (e.keyCode === 37) {
-    // Left arrow
-    if (!collision(currentPiece.x - 1, currentPiece.y, currentPiece.shape)) {
-      currentPiece.x--;
+  if (currentState === GAME_STATE.START) {
+    if (e.code === 'Space') {
+      // Start the game
+      startGame();
     }
-  } else if (e.keyCode === 39) {
-    // Right arrow
-    if (!collision(currentPiece.x + 1, currentPiece.y, currentPiece.shape)) {
-      currentPiece.x++;
+  } else if (currentState === GAME_STATE.PLAYING) {
+    if (e.code === 'Space') {
+      // Pause the game
+      pauseGame();
+    } else if (e.code === 'ArrowLeft') {
+      // Left arrow
+      if (!collision(currentPiece.x - 1, currentPiece.y, currentPiece.shape)) {
+        currentPiece.x--;
+      }
+    } else if (e.code === 'ArrowRight') {
+      // Right arrow
+      if (!collision(currentPiece.x + 1, currentPiece.y, currentPiece.shape)) {
+        currentPiece.x++;
+      }
+    } else if (e.code === 'ArrowDown') {
+      // Down arrow
+      moveDown();
+    } else if (e.code === 'ArrowUp') {
+      // Up arrow
+      rotatePiece();
     }
-  } else if (e.keyCode === 40) {
-    // Down arrow
-    moveDown();
-  } else if (e.keyCode === 38) {
-    // Up arrow
-    rotatePiece();
+  } else if (currentState === GAME_STATE.PAUSED) {
+    if (e.code === 'Space') {
+      // Resume the game
+      resumeGame();
+    }
   }
 });
 
@@ -214,6 +241,10 @@ let dropInterval = 1000;
 let lastTime = 0;
 
 function update(time = 0) {
+  if (currentState !== GAME_STATE.PLAYING) {
+    return; // Exit the game loop if not playing
+  }
+
   const deltaTime = time - lastTime;
   lastTime = time;
   dropCounter += deltaTime;
@@ -226,5 +257,28 @@ function update(time = 0) {
   requestAnimationFrame(update);
 }
 
-newPiece();
-update();
+function startGame() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('gameCanvas').style.display = 'block';
+  currentState = GAME_STATE.PLAYING;
+  newPiece();
+  lastTime = performance.now();
+  update();
+}
+
+function pauseGame() {
+  currentState = GAME_STATE.PAUSED;
+  document.getElementById('pauseScreen').style.display = 'flex';
+}
+
+function resumeGame() {
+  currentState = GAME_STATE.PLAYING;
+  document.getElementById('pauseScreen').style.display = 'none';
+  // Reset timing variables
+  lastTime = performance.now();
+  dropCounter = 0;
+  update();
+}
+
+// Initialize the game (do not start yet)
+drawBoard();

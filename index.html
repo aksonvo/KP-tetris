@@ -2,11 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Product Tetris Game</title>
+  <title>Kraft Tetris Game</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <canvas id="gameCanvas" width="300" height="600"></canvas>
+  <!-- Start Screen -->
+  <div id="startScreen">
+    <h1>Kraft Tetris</h1>
+    <p>Press Spacebar to Start</p>
+  </div>
+
+  <!-- Game Canvas -->
+  <canvas id="gameCanvas" width="300" height="600" style="display: none;"></canvas>
+
+  <!-- Pause Screen -->
+  <div id="pauseScreen" style="display: none;">
+    <h2>Paused</h2>
+    <p>Press Spacebar to Resume</p>
+  </div>
+
   <script src="game.js"></script>
 </body>
 </html>
