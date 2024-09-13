@@ -69,7 +69,15 @@ const GAME_STATE = {
 
 let currentState = GAME_STATE.START;
 
-// Current piece
+// Scoring variables
+let score = 0;
+const lineClearPoints = [0, 100, 300, 500, 800];
+
+// Timer variables
+let startTime = null;
+let elapsedTime = 0;
+let timerInterval = null;
+
 let currentPiece = null;
 
 // Function to create a new piece
@@ -147,6 +155,7 @@ function moveDown() {
           if (currentPiece.y + row < 0) {
             // Game over
             currentState = GAME_STATE.OVER;
+            clearInterval(timerInterval); // Stop the timer
             alert('Game Over');
             document.location.reload();
             return;
@@ -162,6 +171,7 @@ function moveDown() {
 
 // Clear completed lines
 function clearLines() {
+  let linesCleared = 0;
   for (let row = rows - 1; row >= 0; row--) {
     let complete = true;
     for (let col = 0; col < cols; col++) {
@@ -171,6 +181,7 @@ function clearLines() {
       }
     }
     if (complete) {
+      linesCleared++;
       for (let y = row; y > 0; y--) {
         for (let col = 0; col < cols; col++) {
           board[y][col] = board[y - 1][col];
@@ -182,6 +193,24 @@ function clearLines() {
       row++;
     }
   }
+  if (linesCleared > 0) {
+    // Update the score
+    score += lineClearPoints[linesCleared];
+    updateScoreDisplay();
+  }
+}
+
+// Update score display
+function updateScoreDisplay() {
+  document.getElementById('score').textContent = score;
+}
+
+// Update time display
+function updateTimeDisplay() {
+  const totalSeconds = Math.floor(elapsedTime / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  document.getElementById('time').textContent = `${minutes}:${seconds}`;
 }
 
 // Rotate the piece
@@ -261,22 +290,34 @@ function startGame() {
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameCanvas').style.display = 'block';
   currentState = GAME_STATE.PLAYING;
+  score = 0;
+  updateScoreDisplay();
   newPiece();
   lastTime = performance.now();
+  startTime = performance.now();
+  timerInterval = setInterval(() => {
+    elapsedTime = performance.now() - startTime;
+    updateTimeDisplay();
+  }, 1000);
   update();
 }
 
 function pauseGame() {
   currentState = GAME_STATE.PAUSED;
   document.getElementById('pauseScreen').style.display = 'flex';
+  clearInterval(timerInterval);
 }
 
 function resumeGame() {
   currentState = GAME_STATE.PLAYING;
   document.getElementById('pauseScreen').style.display = 'none';
-  // Reset timing variables
+  // Adjust the startTime to account for the paused duration
+  startTime += performance.now() - lastTime;
   lastTime = performance.now();
-  dropCounter = 0;
+  timerInterval = setInterval(() => {
+    elapsedTime = performance.now() - startTime;
+    updateTimeDisplay();
+  }, 1000);
   update();
 }
 

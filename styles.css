@@ -5,6 +5,21 @@ body {
   font-family: Arial, sans-serif;
 }
 
+#gameHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 300px; /* Match canvas width */
+  margin: 20px auto 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+#scoreContainer,
+#timeContainer {
+  font-size: 24px;
+}
+
 #startScreen,
 #pauseScreen {
   display: flex;
@@ -29,10 +44,6 @@ body {
 #gameCanvas {
   background-color: #00447C;
   display: block;
-  margin: auto;
+  margin: 20px auto;
   /* Center the canvas */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
