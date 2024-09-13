@@ -87,3 +87,8 @@ body {
 #highScoreTable td {
   font-size: 18px;
 }
+
+#finalMessage p {
+  margin: 10px 0;
+  font-size: 24px;
+}

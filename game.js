@@ -324,20 +324,26 @@ function showGameOverScreen() {
   const seconds = String(totalSeconds % 60).padStart(2, '0');
   const finalTime = `${minutes}:${seconds}`;
 
-  // Display the final message
-const finalMessage = document.getElementById('finalMessage');
-finalMessage.textContent = `${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!`;
-
-// Create a new paragraph for the additional sentence
-const newSentence = document.createElement('p');
-newSentence.textContent = 'KraftPowercon. We won't let you down!';
-
-// Append the new paragraph after the final message
-finalMessage.parentNode.insertBefore(newSentence, finalMessage.nextSibling);
-
-  // Update high score table
-  updateHighScores(playerName, finalTime);
-}
+  function showGameOverScreen() {
+    document.getElementById('gameCanvas').style.display = 'none';
+    document.getElementById('gameHeader').style.display = 'none';
+    document.getElementById('gameOverScreen').style.display = 'flex';
+  
+    // Format the elapsed time
+    const totalSeconds = Math.floor(elapsedTime / 1000);
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    const finalTime = `${minutes}:${seconds}`;
+  
+    // Display the final message
+    const finalMessage = document.getElementById('finalMessage');
+    finalMessage.innerHTML = `
+      <p>${playerName}, you procrastinated for ${finalTime} with collecting ${score} modules!</p>
+      <p>KraftPowercon. We won't let you bore down!</p>`;
+  
+    // Update high score table
+    updateHighScores(playerName, finalTime);
+  }
 
 function restartGame() {
   // Reset game variables
