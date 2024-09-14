@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  background-color: #000000;
+  background-color: #000;
   color: #fff;
   font-family: Arial, sans-serif;
 }
@@ -14,7 +14,6 @@ body {
   align-items: center;
   height: 100vh;
   text-align: center;
-  background-color: #00447C;
 }
 
 #startScreen h1,
@@ -42,22 +41,54 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 300px; /* Match canvas width */
+  width: 90%;
+  max-width: 600px;
   margin: 20px auto 0 auto;
   padding: 0 10px;
   box-sizing: border-box;
 }
 
 #scoreContainer,
-#timeContainer {
-  font-size: 14px;
+#timeContainer,
+#levelContainer {
+  font-size: 24px;
+}
+
+#gameContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 800px;
 }
 
 #gameCanvas {
   background-color: #00447C;
   display: block;
-  margin: 20px auto;
-  /* Center the canvas */
+  margin: 0;
+}
+
+#nextPieceContainer {
+  margin-left: 20px;
+  text-align: center;
+}
+
+#nextPieceContainer h3 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+#pauseMenu {
+  display: flex;
+  flex-direction: column;
+}
+
+#pauseMenu button {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
 }
 
 #highScoreTable {
@@ -92,4 +123,26 @@ body {
 #finalMessage p {
   margin: 10px 0;
   font-size: 24px;
+}
+
+@media (max-width: 600px) {
+  #gameHeader {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #gameContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #nextPieceContainer {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  #gameCanvas {
+    width: 90vw;
+    height: 180vw;
+  }
 }

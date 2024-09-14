@@ -19,18 +19,33 @@
     <div id="scoreContainer">
       Modules: <span id="score">0</span>
     </div>
+    <div id="levelContainer">
+      Level: <span id="level">1</span>
+    </div>
     <div id="timeContainer">
       Time procrastinated: <span id="time">00:00</span>
     </div>
   </div>
 
-  <!-- Game Canvas -->
-  <canvas id="gameCanvas" width="300" height="600" style="display: none;"></canvas>
+  <!-- Game Container -->
+  <div id="gameContainer" style="display: none;">
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="300" height="600"></canvas>
+    <!-- Next Piece Preview -->
+    <div id="nextPieceContainer">
+      <h3>Next Module</h3>
+      <canvas id="nextPieceCanvas" width="120" height="120"></canvas>
+    </div>
+  </div>
 
   <!-- Pause Screen -->
   <div id="pauseScreen" style="display: none;">
     <h2>Paused</h2>
-    <p>Press Spacebar to Resume</p>
+    <div id="pauseMenu">
+      <button id="resumeButton">Resume</button>
+      <button id="restartButton">Restart</button>
+      <button id="mainMenuButton">Main Menu</button>
+    </div>
   </div>
 
   <!-- Game Over Screen -->

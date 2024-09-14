@@ -1,10 +1,35 @@
 const canvas = document.getElementById('gameCanvas');
 const context = canvas.getContext('2d');
 
+const nextCanvas = document.getElementById('nextPieceCanvas');
+const nextContext = nextCanvas.getContext('2d');
+
 // Set the size of each grid cell
-const grid = 30;
-const rows = 20;
-const cols = 10;
+let grid = 30;
+let rows = 20;
+let cols = 10;
+
+// Responsive design adjustments
+function adjustCanvasSize() {
+  if (window.innerWidth < 600) {
+    grid = window.innerWidth / cols * 0.9 / cols;
+    canvas.width = grid * cols;
+    canvas.height = grid * rows;
+  } else {
+    grid = 30;
+    canvas.width = grid * cols;
+    canvas.height = grid * rows;
+  }
+}
+
+window.addEventListener('resize', () => {
+  adjustCanvasSize();
+  drawBoard();
+  drawPiece();
+  drawNextPiece();
+});
+
+adjustCanvasSize();
 
 // Load the pixel image once
 const pixelImage = new Image();
@@ -73,28 +98,46 @@ let currentState = GAME_STATE.START;
 let score = 0;
 const lineClearPoints = [0, 10, 20, 30, 40];
 
+// Level variables
+let level = 1;
+const linesPerLevel = 5;
+let linesClearedInLevel = 0;
+
 // Timer variables
 let startTime = null;
 let elapsedTime = 0;
 let timerInterval = null;
 
 let currentPiece = null;
+let nextPiece = null;
 let lastTime = 0;
 let dropCounter = 0;
 let dropInterval = 1000;
 
 let playerName = '';
+let holdUsed = false;
 
 // Function to create a new piece
 function newPiece() {
+  if (!nextPiece) {
+    nextPiece = createRandomPiece();
+  }
+  currentPiece = nextPiece;
+  currentPiece.x = Math.floor(cols / 2) - Math.ceil(currentPiece.shape[0].length / 2);
+  currentPiece.y = -1;
+  nextPiece = createRandomPiece();
+}
+
+// Function to create a random piece
+function createRandomPiece() {
   const pieces = 'IJLOSTZ';
   const random = pieces[Math.floor(Math.random() * pieces.length)];
   const shape = tetrominoes[random];
-  currentPiece = {
-    x: Math.floor(cols / 2) - Math.ceil(shape[0].length / 2),
-    y: -1, // Start above the board
+  return {
+    x: 0,
+    y: 0,
     shape: shape,
-    image: images[random], // Use the preloaded pixel image
+    image: images[random],
   };
 }
 
@@ -121,6 +164,26 @@ function drawPiece() {
           (currentPiece.y + row) * grid,
           grid,
           grid
+        );
+      }
+    }
+  }
+  drawGhostPiece();
+}
+
+// Function to draw the next piece
+function drawNextPiece() {
+  nextContext.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+  const scale = grid / 2;
+  for (let row = 0; row < nextPiece.shape.length; row++) {
+    for (let col = 0; col < nextPiece.shape[row].length; col++) {
+      if (nextPiece.shape[row][col]) {
+        nextContext.drawImage(
+          nextPiece.image,
+          col * scale + 20,
+          row * scale + 20,
+          scale,
+          scale
         );
       }
     }
@@ -169,7 +232,10 @@ function moveDown() {
       }
     }
     clearLines();
+    holdUsed = false; // Reset hold
     newPiece();
+    updateLevel();
+    drawNextPiece();
   }
 }
 
@@ -186,6 +252,7 @@ function clearLines() {
     }
     if (complete) {
       linesCleared++;
+      linesClearedInLevel++;
       for (let y = row; y > 0; y--) {
         for (let col = 0; col < cols; col++) {
           board[y][col] = board[y - 1][col];
@@ -207,6 +274,11 @@ function clearLines() {
 // Update score display
 function updateScoreDisplay() {
   document.getElementById('score').textContent = score;
+}
+
+// Update level display
+function updateLevelDisplay() {
+  document.getElementById('level').textContent = level;
 }
 
 // Update time display
@@ -232,6 +304,44 @@ function rotatePiece() {
   }
 }
 
+// Hold piece (not requested but placeholder if needed)
+function holdPiece() {
+  // Implement hold functionality if desired
+}
+
+// Update level based on lines cleared
+function updateLevel() {
+  if (linesClearedInLevel >= linesPerLevel) {
+    level++;
+    linesClearedInLevel = 0;
+    dropInterval = Math.max(100, dropInterval - 100); // Increase speed
+    updateLevelDisplay();
+  }
+}
+
+// Draw ghost piece
+function drawGhostPiece() {
+  let ghostY = currentPiece.y;
+  while (!collision(currentPiece.x, ghostY + 1, currentPiece.shape)) {
+    ghostY++;
+  }
+  context.globalAlpha = 0.3;
+  for (let row = 0; row < currentPiece.shape.length; row++) {
+    for (let col = 0; col < currentPiece.shape[row].length; col++) {
+      if (currentPiece.shape[row][col]) {
+        context.drawImage(
+          currentPiece.image,
+          (currentPiece.x + col) * grid,
+          (ghostY + row) * grid,
+          grid,
+          grid
+        );
+      }
+    }
+  }
+  context.globalAlpha = 1;
+}
+
 // Key controls
 document.addEventListener('keydown', (e) => {
   if (currentState === GAME_STATE.START) {
@@ -240,7 +350,7 @@ document.addEventListener('keydown', (e) => {
       startGame();
     }
   } else if (currentState === GAME_STATE.PLAYING) {
-    if (e.code === 'Space') {
+    if (e.code === 'Escape') {
       // Pause the game
       pauseGame();
     } else if (e.code === 'ArrowLeft') {
@@ -254,14 +364,20 @@ document.addEventListener('keydown', (e) => {
         currentPiece.x++;
       }
     } else if (e.code === 'ArrowDown') {
-      // Down arrow
+      // Soft drop
       moveDown();
     } else if (e.code === 'ArrowUp') {
-      // Up arrow
+      // Rotate
       rotatePiece();
+    } else if (e.code === 'Space') {
+      // Hard drop
+      while (!collision(currentPiece.x, currentPiece.y + 1, currentPiece.shape)) {
+        currentPiece.y++;
+      }
+      moveDown();
     }
   } else if (currentState === GAME_STATE.PAUSED) {
-    if (e.code === 'Space') {
+    if (e.code === 'Escape') {
       // Resume the game
       resumeGame();
     }
@@ -273,17 +389,74 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Touch controls for mobile devices
+let touchStartX = null;
+let touchStartY = null;
+canvas.addEventListener('touchstart', handleTouchStart, false);
+canvas.addEventListener('touchmove', handleTouchMove, false);
+
+function handleTouchStart(evt) {
+  const firstTouch = evt.touches[0];
+  touchStartX = firstTouch.clientX;
+  touchStartY = firstTouch.clientY;
+  evt.preventDefault();
+}
+
+function handleTouchMove(evt) {
+  if (!touchStartX || !touchStartY) {
+    return;
+  }
+
+  let touchEndX = evt.touches[0].clientX;
+  let touchEndY = evt.touches[0].clientY;
+
+  let diffX = touchEndX - touchStartX;
+  let diffY = touchEndY - touchStartY;
+
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    // Horizontal swipe
+    if (diffX > 10) {
+      // Swipe right
+      if (!collision(currentPiece.x + 1, currentPiece.y, currentPiece.shape)) {
+        currentPiece.x++;
+      }
+    } else if (diffX < -10) {
+      // Swipe left
+      if (!collision(currentPiece.x - 1, currentPiece.y, currentPiece.shape)) {
+        currentPiece.x--;
+      }
+    }
+  } else {
+    // Vertical swipe
+    if (diffY > 10) {
+      // Swipe down (soft drop)
+      moveDown();
+    } else if (diffY < -10) {
+      // Swipe up (rotate)
+      rotatePiece();
+    }
+  }
+
+  touchStartX = null;
+  touchStartY = null;
+  evt.preventDefault();
+}
+
 function startGame() {
   const playerNameInput = document.getElementById('playerName');
   playerName = playerNameInput.value.trim() || 'Player'; // Default to 'Player' if name is empty
 
   document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameCanvas').style.display = 'block';
+  document.getElementById('gameContainer').style.display = 'flex';
   document.getElementById('gameHeader').style.display = 'flex';
 
   currentState = GAME_STATE.PLAYING;
   score = 0;
+  level = 1;
+  linesClearedInLevel = 0;
+  dropInterval = 1000;
   updateScoreDisplay();
+  updateLevelDisplay();
   newPiece();
   lastTime = performance.now();
   startTime = performance.now();
@@ -313,8 +486,22 @@ function resumeGame() {
   update();
 }
 
+document.getElementById('resumeButton').addEventListener('click', resumeGame);
+document.getElementById('restartButton').addEventListener('click', restartGame);
+document.getElementById('mainMenuButton').addEventListener('click', () => {
+  currentState = GAME_STATE.START;
+  elapsedTime = 0;
+  score = 0;
+  level = 1;
+  linesClearedInLevel = 0;
+  document.getElementById('pauseScreen').style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'none';
+  document.getElementById('gameHeader').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'flex';
+});
+
 function showGameOverScreen() {
-  document.getElementById('gameCanvas').style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'none';
   document.getElementById('gameHeader').style.display = 'none';
   document.getElementById('gameOverScreen').style.display = 'flex';
 
@@ -345,21 +532,28 @@ function restartGame() {
     }
   }
 
-  currentState = GAME_STATE.START;
+  currentState = GAME_STATE.PLAYING;
   elapsedTime = 0;
   score = 0;
-
-  // Hide game over and high score screens, show start screen
+  level = 1;
+  linesClearedInLevel = 0;
+  dropInterval = 1000;
+  updateScoreDisplay();
+  updateLevelDisplay();
   document.getElementById('gameOverScreen').style.display = 'none';
   document.getElementById('highScoreTable').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-}
+  document.getElementById('pauseScreen').style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'flex';
+  document.getElementById('gameHeader').style.display = 'flex';
 
-function updateTimeDisplay() {
-  const totalSeconds = Math.floor(elapsedTime / 1000);
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
-  const seconds = String(totalSeconds % 60).padStart(2, '0');
-  document.getElementById('time').textContent = `${minutes}:${seconds}`;
+  newPiece();
+  lastTime = performance.now();
+  startTime = performance.now();
+  timerInterval = setInterval(() => {
+    elapsedTime = performance.now() - startTime;
+    updateTimeDisplay();
+  }, 1000);
+  update();
 }
 
 function updateHighScores(name, time) {
