@@ -384,6 +384,14 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// Add event listeners for pause menu buttons
+document.getElementById('resumeButton').addEventListener('click', resumeGame);
+document.getElementById('restartButton').addEventListener('click', restartGame);
+document.getElementById('mainMenuButton').addEventListener('click', returnToMainMenu);
+
+// Add event listener for pause button (for mobile devices)
+document.getElementById('pauseButton').addEventListener('click', pauseGame);
+
 // Touch controls for mobile devices
 let touchStartX = null;
 let touchStartY = null;
@@ -463,29 +471,30 @@ function startGame() {
 }
 
 function pauseGame() {
+  if (currentState !== GAME_STATE.PLAYING) return;
   currentState = GAME_STATE.PAUSED;
   document.getElementById('pauseScreen').style.display = 'flex';
-  clearInterval(timerInterval);
+  clearInterval(timerInterval); // Stop the timer
 }
 
 function resumeGame() {
+  if (currentState !== GAME_STATE.PAUSED) return;
   currentState = GAME_STATE.PLAYING;
   document.getElementById('pauseScreen').style.display = 'none';
   // Adjust the startTime to account for the paused duration
   startTime += performance.now() - lastTime;
   lastTime = performance.now();
+  // Restart the timer
   timerInterval = setInterval(() => {
     elapsedTime = performance.now() - startTime;
     updateTimeDisplay();
   }, 1000);
-  update();
+  update(); // Resume the game loop
 }
 
-document.getElementById('startButton').addEventListener('click', startGame);
-document.getElementById('resumeButton').addEventListener('click', resumeGame);
-document.getElementById('restartButton').addEventListener('click', restartGame);
-document.getElementById('mainMenuButton').addEventListener('click', () => {
+function returnToMainMenu() {
   currentState = GAME_STATE.START;
+  clearInterval(timerInterval);
   elapsedTime = 0;
   score = 0;
   level = 1;
@@ -494,8 +503,9 @@ document.getElementById('mainMenuButton').addEventListener('click', () => {
   document.getElementById('gameContainer').style.display = 'none';
   document.getElementById('gameHeader').style.display = 'none';
   document.getElementById('startScreen').style.display = 'flex';
-});
+}
 
+document.getElementById('startButton').addEventListener('click', startGame);
 document.getElementById('restartGameOverButton').addEventListener('click', restartGame);
 
 function showGameOverScreen() {

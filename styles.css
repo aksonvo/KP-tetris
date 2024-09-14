@@ -37,13 +37,7 @@ body {
   text-align: center;
 }
 
-#startButton {
-  font-size: 24px;
-  padding: 10px 20px;
-  margin-top: 20px;
-  cursor: pointer;
-}
-
+#startButton,
 #restartGameOverButton {
   font-size: 24px;
   padding: 10px 20px;
@@ -56,6 +50,7 @@ body {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  position: relative;
   width: 90%;
   max-width: 600px;
   margin: 20px auto 0 auto;
@@ -98,6 +93,7 @@ body {
 #pauseMenu {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 #pauseMenu button {
@@ -139,6 +135,34 @@ body {
 #finalMessage p {
   margin: 10px 0;
   font-size: 24px;
+}
+
+/* Style for Pause Screen */
+#pauseScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 68, 124, 0.9); /* Semi-transparent background */
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Style for Pause Button */
+#pauseButtonContainer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+#pauseButton {
+  font-size: 16px;
+  padding: 5px 10px;
+  cursor: pointer;
 }
 
 @media (max-width: 600px) {
