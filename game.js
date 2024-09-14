@@ -12,7 +12,7 @@ let cols = 10;
 // Responsive design adjustments
 function adjustCanvasSize() {
   if (window.innerWidth < 600) {
-    grid = window.innerWidth / cols * 0.9 / cols;
+    grid = (window.innerWidth * 0.9) / cols;
     canvas.width = grid * cols;
     canvas.height = grid * rows;
   } else {
@@ -304,11 +304,6 @@ function rotatePiece() {
   }
 }
 
-// Hold piece (not requested but placeholder if needed)
-function holdPiece() {
-  // Implement hold functionality if desired
-}
-
 // Update level based on lines cleared
 function updateLevel() {
   if (linesClearedInLevel >= linesPerLevel) {
@@ -486,6 +481,7 @@ function resumeGame() {
   update();
 }
 
+document.getElementById('startButton').addEventListener('click', startGame);
 document.getElementById('resumeButton').addEventListener('click', resumeGame);
 document.getElementById('restartButton').addEventListener('click', restartGame);
 document.getElementById('mainMenuButton').addEventListener('click', () => {
@@ -499,6 +495,8 @@ document.getElementById('mainMenuButton').addEventListener('click', () => {
   document.getElementById('gameHeader').style.display = 'none';
   document.getElementById('startScreen').style.display = 'flex';
 });
+
+document.getElementById('restartGameOverButton').addEventListener('click', restartGame);
 
 function showGameOverScreen() {
   document.getElementById('gameContainer').style.display = 'none';

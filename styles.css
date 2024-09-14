@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  background-color: hsl(0, 0%, 0%);
+  background-color: #00447C;
   color: #fff;
   font-family: Arial, sans-serif;
 }
@@ -37,10 +37,25 @@ body {
   text-align: center;
 }
 
+#startButton {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+#restartGameOverButton {
+  font-size: 24px;
+  padding: 10px 20px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
 #gameHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   width: 90%;
   max-width: 600px;
   margin: 20px auto 0 auto;
@@ -51,20 +66,21 @@ body {
 #scoreContainer,
 #timeContainer,
 #levelContainer {
-  font-size: 24px;
+  font-size: 14px;
 }
 
 #gameContainer {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  flex-wrap: wrap;
   margin: 0 auto;
   padding: 20px;
   max-width: 800px;
 }
 
 #gameCanvas {
-  background-color: #00447C;
+  background-color: #000;
   display: block;
   margin: 0;
 }
